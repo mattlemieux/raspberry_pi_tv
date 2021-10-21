@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 import os
+import KY040
 
 os.system('raspi-gpio set 19 ip')
 GPIO.setmode(GPIO.BCM)
@@ -22,8 +23,7 @@ def turn_screen_off():
 
 # Callback for rotary change
 def rotaryChange(direction):
-    print "turned - " + str(direction)
-
+    print ("turned - " + str(direction))
 
 # Callback for switch button pressed
 def switchPressed():
