@@ -18,20 +18,19 @@ SCREEN_ON = False
 def turn_screen_on():
     for i in range(101):
         SCREEN.duty_cycle = int(i * 65535 / 100)
-        time.sleep(0.01)
+        sleep(0.01)
 
 def turn_screen_off():
     for i in range(100, -1, -1):
         SCREEN.duty_cycle = int(i * 65535 / 100)
-        time.sleep(0.01)
-    time.sleep(1)
+        sleep(0.01)
 
 # Callback for rotary change
-def rotaryChange(direction):
+def rotary_change(direction):
     print ("turned - " + str(direction))
 
 # Callback for switch button pressed
-def switchPressed():
+def switch_pressed():
     global SCREEN_ON
     if SCREEN_ON:
         turn_screen_off()
@@ -42,7 +41,7 @@ def switchPressed():
 turn_screen_off()
 
 # Create a KY040 and start it
-ky040 = KY040(CLOCKPIN, DATAPIN, SWITCHPIN, rotaryChange, switchPressed)
+ky040 = KY040(CLOCKPIN, DATAPIN, SWITCHPIN, rotary_change, switch_pressed)
 ky040.start()
 
 try:
