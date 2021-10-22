@@ -33,8 +33,10 @@ def rotary_change(direction):
 def switch_pressed():
     global SCREEN_ON
     if SCREEN_ON:
+        print("turning screen off")
         turn_screen_off()
     else:
+        print("turning screen on")
         turn_screen_on()
     SCREEN_ON = not SCREEN_ON
  
