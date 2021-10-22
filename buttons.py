@@ -1,27 +1,30 @@
 import RPi.GPIO as GPIO
-from time import sleep
-import os
 from KY040 import KY040
+from time import sleep
 
-os.system('raspi-gpio set 19 ip')
+import board
+import pwmio
+
+#KY040 setup
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(18, GPIO.OUT)
-
-# Define your pins
 CLOCKPIN = 13
 DATAPIN = 6
 SWITCHPIN = 5
 
+#PiTFT Setup
+SCREEN = pwmio.PWMOut(board.D18, frequency=5000, duty_cycle=0)
 SCREEN_ON = False
 
 def turn_screen_on():
-    os.system('raspi-gpio set 19 op a5')
-    GPIO.output(18, GPIO.HIGH)
+    for i in range(101):
+        SCREEN.duty_cycle = int(i * 65535 / 100)
+        time.sleep(0.01)
 
 def turn_screen_off():
-    os.system('raspi-gpio set 19 ip')
-    GPIO.output(18, GPIO.LOW)
+    for i in range(100, -1, -1):
+        SCREEN.duty_cycle = int(i * 65535 / 100)
+        time.sleep(0.01)
+    time.sleep(1)
 
 # Callback for rotary change
 def rotaryChange(direction):
@@ -36,13 +39,11 @@ def switchPressed():
         turn_screen_on()
     SCREEN_ON = not SCREEN_ON
  
-
 turn_screen_off()
 
 # Create a KY040 and start it
 ky040 = KY040(CLOCKPIN, DATAPIN, SWITCHPIN, rotaryChange, switchPressed)
 ky040.start()
-
 
 try:
     while True:
