@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-import time
+import time import sleep
 import os
 from KY040 import KY040
 
