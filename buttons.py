@@ -13,9 +13,7 @@ CLOCKPIN = 13
 DATAPIN = 6
 SWITCHPIN = 5
 
-# Create a KY040 and start it
-ky040 = KY040(CLOCKPIN, DATAPIN, SWITCHPIN, rotaryChange, switchPressed)
-ky040.start()
+
 
 def turn_screen_on():
     os.system('raspi-gpio set 19 op a5')
@@ -36,11 +34,16 @@ def switchPressed():
     else:
         turn_screen_on()
     screen_on = not screen_on
-        
+ 
 
 turn_screen_off()
 screen_on = False
-# Keep your proccess running
+
+# Create a KY040 and start it
+ky040 = KY040(CLOCKPIN, DATAPIN, SWITCHPIN, rotaryChange, switchPressed)
+ky040.start()
+
+
 try:
     while True:
         sleep(0.1)
