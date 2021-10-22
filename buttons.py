@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 import os
-import KY040
+from KY040 import KY040
 
 os.system('raspi-gpio set 19 ip')
 GPIO.setmode(GPIO.BCM)
@@ -12,6 +12,10 @@ GPIO.setup(18, GPIO.OUT)
 CLOCKPIN = 13
 DATAPIN = 6
 SWITCHPIN = 5
+
+# Create a KY040 and start it
+ky040 = KY040(CLOCKPIN, DATAPIN, SWITCHPIN, rotaryChange, switchPressed)
+ky040.start()
 
 def turn_screen_on():
     os.system('raspi-gpio set 19 op a5')
@@ -33,9 +37,6 @@ def switchPressed():
         turn_screen_on()
     screen_on = not screen_on
         
-# Create a KY040 and start it
-ky040 = KY040(CLOCKPIN, DATAPIN, SWITCHPIN, rotaryChange, switchPressed)
-ky040.start()
 
 turn_screen_off()
 screen_on = False
