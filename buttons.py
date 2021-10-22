@@ -29,6 +29,7 @@ def rotaryChange(direction):
 
 # Callback for switch button pressed
 def switchPressed():
+    global SCREEN_ON
     if SCREEN_ON:
         turn_screen_off()
     else:
