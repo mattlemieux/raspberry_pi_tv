@@ -13,7 +13,7 @@ CLOCKPIN = 13
 DATAPIN = 6
 SWITCHPIN = 5
 
-
+SCREEN_ON = False
 
 def turn_screen_on():
     os.system('raspi-gpio set 19 op a5')
@@ -29,15 +29,14 @@ def rotaryChange(direction):
 
 # Callback for switch button pressed
 def switchPressed():
-    if screen_on:
+    if SCREEN_ON:
         turn_screen_off()
     else:
         turn_screen_on()
-    screen_on = not screen_on
+    SCREEN_ON = not SCREEN_ON
  
 
 turn_screen_off()
-screen_on = False
 
 # Create a KY040 and start it
 ky040 = KY040(CLOCKPIN, DATAPIN, SWITCHPIN, rotaryChange, switchPressed)
