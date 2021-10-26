@@ -66,13 +66,16 @@ def switch_pressed():
     SCREEN_ON = not SCREEN_ON
 
 def get_videos():
-    videos = defaultdict(list)
+    videos = {}
 
     for folder in os.listdir(ROOT_DIR):
-        for videos in os.listdir(os.path.join(ROOT_DIR, folder)):
-            if videos.lower().endswith('.mp4'):
-                videos[folder].append(os.path.join(ROOT_DIR, folder, file))
-
+        for file in os.listdir(os.path.join(ROOT_DIR, folder)):
+            if file.lower().endswith('.mp4'):
+                newvideo = os.path.join(ROOT_DIR, folder, file)
+                if videos[folder]:
+                    videos[folder].append(newvideo)
+                else:
+                    videos[folder] = [newvideo]
     return videos
 
 def play_video(videos):
@@ -81,7 +84,7 @@ def play_video(videos):
         Popen(['omxplayer', '--no-osd', '--aspect-mode', 'fill', video])
 
 VIDEOS = get_videos()
-play_video(list(VIDEOS)[CURR_INDEX])
+play_video(VIDEOS[list(VIDEOS)[CURR_INDEX]])
 
 turn_screen_off()
 # Create a KY040 and start it
