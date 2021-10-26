@@ -69,7 +69,11 @@ def get_videos():
     videos = {}
 
     for folder in os.listdir(ROOT_DIR):
+        print (folder)
+        print (os.path.join(ROOT_DIR, folder))
         for file in os.listdir(os.path.join(ROOT_DIR, folder)):
+            print (file)
+            print (os.path.join(ROOT_DIR, folder, file))
             if file.lower().endswith('.mp4'):
                 newvideo = os.path.join(ROOT_DIR, folder, file)
                 if videos[folder]:
