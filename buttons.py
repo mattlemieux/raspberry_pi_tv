@@ -76,7 +76,7 @@ def get_videos():
             print (os.path.join(ROOT_DIR, folder, file))
             if file.lower().endswith('.mp4'):
                 newvideo = os.path.join(ROOT_DIR, folder, file)
-                if videos[folder]:
+                if folder in videos:
                     videos[folder].append(newvideo)
                 else:
                     videos[folder] = [newvideo]
