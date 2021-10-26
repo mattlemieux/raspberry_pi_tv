@@ -53,8 +53,9 @@ def rotary_change(direction):
 
     if new_index != CURR_INDEX:
         CURR_INDEX = new_index 
+        print('changing to ' + CURR_INDEX)
+        OMX_PROCESS.kill()
         play_video(list(VIDEOS)[CURR_INDEX])
-
 
 
 # Callback for switch button pressed
@@ -82,9 +83,10 @@ def get_videos():
     return videos
 
 def play_video(videos):
+    global OMX_PROCESS
     random.shuffle(videos)
     for video in videos:
-        Popen(['omxplayer', '--no-osd', '--aspect-mode', 'fill', video])
+        OMX_PROCESS = Popen(['omxplayer', '--no-osd', '--aspect-mode', 'fill', video])
 
 VIDEOS = get_videos()
 play_video(VIDEOS[list(VIDEOS)[CURR_INDEX]])
