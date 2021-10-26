@@ -12,21 +12,34 @@ DATAPIN = 6
 SWITCHPIN = 5
 
 #PiTFT Setup
-SCREEN = pwmio.PWMOut(board.D18, frequency=5000, duty_cycle=0)
+# SCREEN = pwmio.PWMOut(board.D18, frequency=5000, duty_cycle=0)
 SCREEN_ON = False
+os.system('raspi-gpio set 19 ip')
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(18, GPIO.OUT)
+
 
 def turn_screen_on():
-    for i in range(101):
-        SCREEN.duty_cycle = int(i * 65535 / 100)
-        sleep(0.01)
+    # brighten screen
+    # for i in range(101):
+    #     SCREEN.duty_cycle = int(i * 65535 / 100)
+    #     sleep(0.01)
+    os.system('raspi-gpio set 19 op a5')
+    GPIO.output(18, GPIO.HIGH)
 
 def turn_screen_off():
-    for i in range(100, -1, -1):
-        SCREEN.duty_cycle = int(i * 65535 / 100)
-        sleep(0.01)
+    # dim screen
+    # for i in range(100, -1, -1):
+    #     SCREEN.duty_cycle = int(i * 65535 / 100)
+    #     sleep(0.01)
+    os.system('raspi-gpio set 19 ip')
+    GPIO.output(18, GPIO.LOW)
 
 # Callback for rotary change
 def rotary_change(direction):
+    # 1 - open next folder
+    # 0 - play previous folder
     print ("turned - " + str(direction))
 
 # Callback for switch button pressed
