@@ -39,18 +39,22 @@ def rotary_change(direction):
     global VIDEOS
     global CURR_INDEX
 
-    new_index = -1
+    new_index = CURR_INDEX
+    print (new_index)
+    print (len(VIDEOS))
     if (direction == KY040.ANTICLOCKWISE):
-        if (CURR_INDEX + 1 >= len(VIDEOS)):
+        print ("counterclockwise")
+        if (new_index + 1 >= len(VIDEOS)):
             new_index = 0
         else:
             new_index+=1
     else:
-        if (CURR_INDEX - 1 < 0):
+        print ("clockwise")
+        if (new_index - 1 < 0):
             new_index = len(VIDEOS) - 1
         else:
             new_index-=1
-
+    print (new_index)
     if new_index != CURR_INDEX:
         CURR_INDEX = new_index 
         print('changing to ' + CURR_INDEX)
