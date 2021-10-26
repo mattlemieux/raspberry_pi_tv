@@ -40,8 +40,6 @@ def rotary_change(direction):
     global CURR_INDEX
 
     new_index = CURR_INDEX
-    print (new_index)
-    print (len(VIDEOS))
     if (direction == KY040.ANTICLOCKWISE):
         print ("counterclockwise")
         if (new_index + 1 >= len(VIDEOS)):
@@ -49,17 +47,14 @@ def rotary_change(direction):
         else:
             new_index+=1
     else:
-        print ("clockwise")
         if (new_index - 1 < 0):
             new_index = len(VIDEOS) - 1
         else:
             new_index-=1
-    print (new_index)
     if new_index != CURR_INDEX:
         CURR_INDEX = new_index 
-        print('changing to ' + CURR_INDEX)
         OMX_PROCESS.kill()
-        play_video(list(VIDEOS)[CURR_INDEX])
+        play_video(VIDEOS[list(VIDEOS)[CURR_INDEX]])
 
 
 # Callback for switch button pressed
