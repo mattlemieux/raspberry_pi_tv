@@ -2,10 +2,11 @@ import RPi.GPIO as GPIO
 from KY040 import KY040
 from time import sleep
 
-import board
-import pwmio
 import os
+import random
 from subprocess import PIPE, Popen, STDOUT
+from collections import defaultdict
+
 
 #KY040 setup
 GPIO.setmode(GPIO.BCM)
@@ -14,9 +15,13 @@ DATAPIN = 6
 SWITCHPIN = 5
 
 #PiTFT Setup
-# SCREEN = pwmio.PWMOut(board.D18, frequency=5000, duty_cycle=0)
 SCREEN_ON = False
+VIDEOS = {}
+CURR_INDEX = 0
 os.system('raspi-gpio set 19 ip')
+
+#Video Stuff
+ROOT_DIR = '/home/pi/videos'
 
 def turn_screen_on():
     os.system('raspi-gpio set 19 op a5')
@@ -28,9 +33,26 @@ def turn_screen_off():
 
 # Callback for rotary change
 def rotary_change(direction):
+    print ("turned - " + str(direction))
     # 1 - open next folder
     # 0 - play previous folder
-    print ("turned - " + str(direction))
+    global VIDEOS
+    global CURR_INDEX
+
+    if (direction == KY040.ANTICLOCKWISE):
+        if (CURR_INDEX + 1 > len(VIDEOS)):
+            CURR_INDEX = 0
+        else:
+            CURR_INDEX+=1
+    else:
+        if (CURR_INDEX - 1 > 0):
+            CURR_INDEX = len(VIDEOS) - 1
+        else:
+            CURR_INDEX-=1
+
+    play_video(list(VIDEOS)[CURR_INDEX])
+
+
 
 # Callback for switch button pressed
 def switch_pressed():
@@ -42,9 +64,26 @@ def switch_pressed():
         print("turning screen on")
         turn_screen_on()
     SCREEN_ON = not SCREEN_ON
- 
-turn_screen_off()
 
+def get_videos():
+    videos = defaultdict(list)
+
+    for folder in os.listdir(ROOT_DIR):
+        for videos in os.listdir(folder):
+            if videos.lower().endswith('.mp4'):
+                videos[folder].append(os.path.join(ROOT_DIR, folder, file))
+
+    return videos
+
+def play_video(videos):
+    random.shuffle(videos)
+    for video in videos:
+        Popen(['omxplayer', '--no-osd', '--aspect-mode', 'fill', video])
+
+VIDEOS = get_videos()
+play_video(list(VIDEOS)[CURR_INDEX])
+
+turn_screen_off()
 # Create a KY040 and start it
 ky040 = KY040(CLOCKPIN, DATAPIN, SWITCHPIN, rotary_change, switch_pressed)
 ky040.start()
