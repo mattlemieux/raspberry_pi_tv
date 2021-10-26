@@ -39,18 +39,21 @@ def rotary_change(direction):
     global VIDEOS
     global CURR_INDEX
 
+    new_index = -1
     if (direction == KY040.ANTICLOCKWISE):
-        if (CURR_INDEX + 1 > len(VIDEOS)):
-            CURR_INDEX = 0
+        if (CURR_INDEX + 1 >= len(VIDEOS)):
+            new_index = 0
         else:
-            CURR_INDEX+=1
+            new_index+=1
     else:
-        if (CURR_INDEX - 1 > 0):
-            CURR_INDEX = len(VIDEOS) - 1
+        if (CURR_INDEX - 1 < 0):
+            new_index = len(VIDEOS) - 1
         else:
-            CURR_INDEX-=1
+            new_index-=1
 
-    play_video(list(VIDEOS)[CURR_INDEX])
+    if new_index != CURR_INDEX:
+        CURR_INDEX = new_index 
+        play_video(list(VIDEOS)[CURR_INDEX])
 
 
 
@@ -69,11 +72,7 @@ def get_videos():
     videos = {}
 
     for folder in os.listdir(ROOT_DIR):
-        print (folder)
-        print (os.path.join(ROOT_DIR, folder))
         for file in os.listdir(os.path.join(ROOT_DIR, folder)):
-            print (file)
-            print (os.path.join(ROOT_DIR, folder, file))
             if file.lower().endswith('.mp4'):
                 newvideo = os.path.join(ROOT_DIR, folder, file)
                 if folder in videos:
