@@ -53,7 +53,7 @@ def rotary_change(direction):
             new_index-=1
     if new_index != CURR_INDEX:
         CURR_INDEX = new_index 
-        OMX_PROCESS.kill()
+        os.system('killall omxplayer.bin')
         play_video(VIDEOS[list(VIDEOS)[CURR_INDEX]])
 
 
