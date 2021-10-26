@@ -4,6 +4,8 @@ from time import sleep
 
 import board
 import pwmio
+import os
+
 
 #KY040 setup
 GPIO.setmode(GPIO.BCM)
