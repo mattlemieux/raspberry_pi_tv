@@ -69,7 +69,7 @@ def get_videos():
     videos = defaultdict(list)
 
     for folder in os.listdir(ROOT_DIR):
-        for videos in os.listdir(folder):
+        for videos in os.listdir(os.path.join(ROOT_DIR, folder)):
             if videos.lower().endswith('.mp4'):
                 videos[folder].append(os.path.join(ROOT_DIR, folder, file))
 
