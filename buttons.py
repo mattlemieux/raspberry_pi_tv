@@ -5,7 +5,7 @@ from time import sleep
 import board
 import pwmio
 import os
-
+from subprocess import PIPE, Popen, STDOUT
 
 #KY040 setup
 GPIO.setmode(GPIO.BCM)
@@ -17,26 +17,14 @@ SWITCHPIN = 5
 # SCREEN = pwmio.PWMOut(board.D18, frequency=5000, duty_cycle=0)
 SCREEN_ON = False
 os.system('raspi-gpio set 19 ip')
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(18, GPIO.OUT)
-
 
 def turn_screen_on():
-    # brighten screen
-    # for i in range(101):
-    #     SCREEN.duty_cycle = int(i * 65535 / 100)
-    #     sleep(0.01)
     os.system('raspi-gpio set 19 op a5')
-    GPIO.output(18, GPIO.HIGH)
+    os.system("sudo sh -c 'echo \"1\" > /sys/class/backlight/soc:backlight/brightness'")
 
 def turn_screen_off():
-    # dim screen
-    # for i in range(100, -1, -1):
-    #     SCREEN.duty_cycle = int(i * 65535 / 100)
-    #     sleep(0.01)
     os.system('raspi-gpio set 19 ip')
-    GPIO.output(18, GPIO.LOW)
+    os.system("sudo sh -c 'echo \"0\" > /sys/class/backlight/soc:backlight/brightness'")
 
 # Callback for rotary change
 def rotary_change(direction):
