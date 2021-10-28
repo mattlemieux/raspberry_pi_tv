@@ -80,8 +80,10 @@ class TVService:
                 player = OMXPlayer(video, args='--no-osd --aspect-mode fill')
                 player.play()
                 while (getattr(t, "do_run", True) and player.playback_status() == "Playing"):
+                    print(player.playback_status())
                     sleep(0.1)
                 if not getattr(t, "do_run", True):
+                    print("qutting because do_run is false")
                     return
         finally:
             print("shutting down video thread")
