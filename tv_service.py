@@ -1,108 +1,143 @@
-import RPi.GPIO as GPIO
+
 from KY040 import KY040
+from omxplayer.player import OMXPlayer
+from pathlib import Path
+from threading import Thread, Lock, currentThread
 from time import sleep
 
 import os
 import random
-from subprocess import PIPE, Popen, STDOUT
-from collections import defaultdict
-
-#KY040 setup
-GPIO.setmode(GPIO.BCM)
-CLOCKPIN = 13
-DATAPIN = 6
-SWITCHPIN = 5
-
-#PiTFT Setup
-SCREEN_ON = False
-VIDEOS = {}
-CURR_INDEX = 0
-os.system('raspi-gpio set 19 ip')
-GPIO.setup(18, GPIO.OUT)
-
-#Video Stuff
 ROOT_DIR = '/home/pi/videos'
+import RPi.GPIO as GPIO
 
-def turn_screen_on():
-    os.system('raspi-gpio set 19 op a5')
-    GPIO.output(18, GPIO.HIGH)
-    # os.system("sudo sh -c 'echo \"1\" > /sys/class/backlight/soc:backlight/brightness'")
+# sudo apt-get update && sudo apt-get install -y libdbus-1{,-dev}
+# $ pip install omxplayer-wrapper
 
-def turn_screen_off():
-    os.system('raspi-gpio set 19 ip')
-    GPIO.output(18, GPIO.LOW)
-    # os.system("sudo sh -c 'echo \"0\" > /sys/class/backlight/soc:backlight/brightness'")
-
-PROCESSING_CHANGE = False
-# Callback for rotary change
-def rotary_change(direction):
-    print ("turned - " + str(direction))
-    # 1 - open next folder
-    # 0 - play previous folder
-    global VIDEOS
-    global CURR_INDEX
-    global PROCESSING_CHANGE
-
-    if not PROCESSING_CHANGE:
-        PROCESSING_CHANGE = True
-        new_index = CURR_INDEX
-        if (direction == KY040.ANTICLOCKWISE):
-            if (new_index + 1 >= len(VIDEOS)):
-                new_index = 0
-            else:
-                new_index+=1
-        else:
-            if (new_index - 1 < 0):
-                new_index = len(VIDEOS) - 1
-            else:
-                new_index-=1
-        if new_index != CURR_INDEX:
-            CURR_INDEX = new_index 
-            os.system('killall omxplayer.bin')
-            play_video(VIDEOS[list(VIDEOS)[CURR_INDEX]])
-        PROCESSING_CHANGE = False
-
-# Callback for switch button pressed
-def switch_pressed():
-    global SCREEN_ON
-    if SCREEN_ON:
-        print("turning screen off")
-        turn_screen_off()
-    else:
+class TVService:
+    def turn_screen_on(self):
         print("turning screen on")
-        turn_screen_on()
-    SCREEN_ON = not SCREEN_ON
+        os.system('raspi-gpio set 19 op a5') # audio on
+        GPIO.output(18, GPIO.HIGH) # video on
 
-def get_videos():
-    videos = {}
-    for folder in os.listdir(ROOT_DIR):
-        for file in os.listdir(os.path.join(ROOT_DIR, folder)):
-            if file.lower().endswith('.mp4'):
-                newvideo = os.path.join(ROOT_DIR, folder, file)
-                if folder in videos:
-                    videos[folder].append(newvideo)
+
+    def turn_screen_off(self):
+        print("turning screen off")
+        os.system('raspi-gpio set 19 ip') # audio off
+        GPIO.output(18, GPIO.LOW) # video off
+
+
+    def rotary_change(self, direction):
+        print ("rotary_change - " + str(direction))
+        # 1 - open next folder
+        # 0 - play previous folder
+        self.lock.acquire()
+        try:
+            new_index = self.current_video_index
+            if (direction == KY040.ANTICLOCKWISE):
+                if (new_index + 1 >= len(self.video_dict)):
+                    new_index = 0
                 else:
-                    videos[folder] = [newvideo]
-    return videos
+                    new_index+=1
+            else:
+                if (new_index - 1 < 0):
+                    new_index = len(self.video_dict) - 1
+                else:
+                    new_index-=1
+            if new_index != self.current_video_index:
+                self.current_video_index = new_index 
+                self.play_videos(self.video_dict[list(self.video_dict)[self.current_video_index]])
+        finally:
+            self.lock.release()
 
-def play_video(videos):
-    global OMX_PROCESS
-    random.shuffle(videos)
-    for video in videos:
-        OMX_PROCESS = Popen(['omxplayer', '--no-osd', '--aspect-mode', 'fill', video])
 
-VIDEOS = get_videos()
-play_video(VIDEOS[list(VIDEOS)[CURR_INDEX]])
+    def switch_pressed(self):
+        if self.screen_on:
+            self.turn_screen_off()
+        else:
+            self.turn_screen_on()
+        self.screen_on = not self.screen_on
 
-turn_screen_off()
-# Create a KY040 and start it
-ky040 = KY040(CLOCKPIN, DATAPIN, SWITCHPIN, rotary_change, switch_pressed)
-ky040.start()
 
-try:
-    while True:
-        sleep(0.1)
-finally:
-    ky040.stop()
-    GPIO.cleanup()
-    os.system('killall omxplayer.bin')
+    def get_videos(self):
+        videos = {}
+        for folder in os.listdir(self.video_dir):
+            for file in os.listdir(os.path.join(self.video_dir, folder)):
+                if file.lower().endswith('.mp4'):
+                    newvideo = os.path.join(self.video_dir, folder, file)
+                    if folder in videos:
+                        videos[folder].append(newvideo)
+                    else:
+                        videos[folder] = [newvideo]
+            random.shuffle(videos[folder])
+        return videos
+
+
+    def play_video_thread(self, videos):
+        player = {}
+        try:
+            t = currentThread()
+            for video in videos:
+                player = OMXPlayer(video, args='--no-osd --aspect-mode fill')
+                player.play()
+                while (getattr(t, "do_run", True) and player.playback_status() == "Playing"):
+                    sleep(0.1)
+                if not getattr(t, "do_run", True):
+                    return
+        finally:
+            print("shutting down video thread")
+            player.quit()
+
+    def stop_play_video_thread(self):
+        if (self.omx_thread and self.omx_thread.isAlive()):
+            print("stopping video thread")
+            self.omx_thread.do_run = False
+            self.omx_thread.join()
+
+    def start_play_video_thread(self, videos):
+        print("starting video thread")
+        self.omx_thread = Thread(target=self.play_video_thread, args=(videos,))
+        self.omx_thread.start()
+
+    def play_videos(self, videos):
+        self.stop_play_video_thread()
+        self.start_play_video_thread(videos)
+
+    def run(self):
+        print("staring video service")
+        self.turn_screen_off()
+        self.ky040.start()
+        
+        self.play_videos(self.video_dict[list(self.video_dict)[self.current_video_index]])
+
+        try:
+            print("listening for events....")
+            while True:
+                sleep(0.1)
+        finally:
+            print("shutting down")
+            self.stop_play_video_thread()
+            self.ky040.stop()
+            GPIO.cleanup()
+
+
+    def __init__(self, clock_pin, data_pin, switch_pin, backlight_pin, video_dir):
+        GPIO.setmode(GPIO.BCM)
+        os.system('raspi-gpio set 19 ip')
+        GPIO.setup(backlight_pin, GPIO.OUT)
+
+        ky040 = KY040(clock_pin, data_pin, switch_pin, self.rotary_change, self.switch_pressed)
+
+        self.ky040 = ky040
+        self.video_dir = video_dir
+
+        self.screen_on = False
+        self.video_dict = self.get_videos()
+        self.current_video_index = 0
+
+        self.omx_thread = None
+        self.lock = Lock()
+
+# rm CMakeCache.txt
+# cmake -DARMV6Z=ON -DADAFRUIT_HX8357D_PITFT=ON -DSPI_BUS_CLOCK_DIVISOR=8 -DSTATISTICS=0 -DBACKLIGHT_CONTROL=ON ..
+# make -j
+# sudo ./fbcp-ili9341
