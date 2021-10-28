@@ -27,26 +27,26 @@ class TVService:
 
     def rotary_change(self, direction):
         print ("rotary_change - " + str(direction))
-        # 1 - open next folder
-        # 0 - play previous folder
-        self.lock.acquire()
-        try:
-            new_index = self.current_video_index
-            if (direction == KY040.ANTICLOCKWISE):
-                if (new_index + 1 >= len(self.video_dict)):
-                    new_index = 0
-                else:
-                    new_index+=1
-            else:
-                if (new_index - 1 < 0):
-                    new_index = len(self.video_dict) - 1
-                else:
-                    new_index-=1
-            if new_index != self.current_video_index:
-                self.current_video_index = new_index 
-                self.play_videos(self.video_dict[list(self.video_dict)[self.current_video_index]])
-        finally:
-            self.lock.release()
+        # # 1 - open next folder
+        # # 0 - play previous folder
+        # self.lock.acquire()
+        # try:
+        #     new_index = self.current_video_index
+        #     if (direction == KY040.ANTICLOCKWISE):
+        #         if (new_index + 1 >= len(self.video_dict)):
+        #             new_index = 0
+        #         else:
+        #             new_index+=1
+        #     else:
+        #         if (new_index - 1 < 0):
+        #             new_index = len(self.video_dict) - 1
+        #         else:
+        #             new_index-=1
+        #     if new_index != self.current_video_index:
+        #         self.current_video_index = new_index 
+        #         self.play_videos(self.video_dict[list(self.video_dict)[self.current_video_index]])
+        # finally:
+        #     self.lock.release()
 
 
     def switch_pressed(self):
