@@ -83,7 +83,7 @@ class TVService:
                 print("entering the wait loop")
                 while (player.playback_status() == "Playing"):
                     print(player.playback_status())
-                    if getattr(t, "do_run", True):
+                    if not getattr(t, "do_run", True):
                         print("qutting because do_run is false")
                         return
                     sleep(0.1)
