@@ -7,7 +7,6 @@ import random
 from subprocess import PIPE, Popen, STDOUT
 from collections import defaultdict
 
-
 #KY040 setup
 GPIO.setmode(GPIO.BCM)
 CLOCKPIN = 13
@@ -19,17 +18,20 @@ SCREEN_ON = False
 VIDEOS = {}
 CURR_INDEX = 0
 os.system('raspi-gpio set 19 ip')
+GPIO.setup(18, GPIO.OUT)
 
 #Video Stuff
 ROOT_DIR = '/home/pi/videos'
 
 def turn_screen_on():
     os.system('raspi-gpio set 19 op a5')
-    os.system("sudo sh -c 'echo \"1\" > /sys/class/backlight/soc:backlight/brightness'")
+    GPIO.output(18, GPIO.HIGH)
+    # os.system("sudo sh -c 'echo \"1\" > /sys/class/backlight/soc:backlight/brightness'")
 
 def turn_screen_off():
     os.system('raspi-gpio set 19 ip')
-    os.system("sudo sh -c 'echo \"0\" > /sys/class/backlight/soc:backlight/brightness'")
+    GPIO.output(18, GPIO.LOW)
+    # os.system("sudo sh -c 'echo \"0\" > /sys/class/backlight/soc:backlight/brightness'")
 
 # Callback for rotary change
 def rotary_change(direction):
@@ -101,3 +103,4 @@ try:
 finally:
     ky040.stop()
     GPIO.cleanup()
+    os.system('killall omxplayer.bin')
