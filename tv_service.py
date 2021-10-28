@@ -63,11 +63,12 @@ class TVService:
             for file in os.listdir(os.path.join(self.video_dir, folder)):
                 if file.lower().endswith('.mp4'):
                     newvideo = os.path.join(self.video_dir, folder, file)
-                    if folder in videos:
-                        videos[folder].append(newvideo)
+                    if videos.get(folder):
+                        videos.get(folder).append(newvideo)
                     else:
                         videos[folder] = [newvideo]
-            random.shuffle(videos[folder])
+            if (videos.get(folder)):
+                random.shuffle(videos.get(folder))
         return videos
 
 
