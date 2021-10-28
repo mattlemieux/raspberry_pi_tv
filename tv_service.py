@@ -7,11 +7,10 @@ from time import sleep
 
 import os
 import random
-ROOT_DIR = '/home/pi/videos'
 import RPi.GPIO as GPIO
 
 # sudo apt-get update && sudo apt-get install -y libdbus-1{,-dev}
-# $ pip install omxplayer-wrapper
+# pip install omxplayer-wrapper
 
 class TVService:
     def turn_screen_on(self):
