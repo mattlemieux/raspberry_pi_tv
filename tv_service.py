@@ -33,6 +33,7 @@ def turn_screen_off():
     GPIO.output(18, GPIO.LOW)
     # os.system("sudo sh -c 'echo \"0\" > /sys/class/backlight/soc:backlight/brightness'")
 
+PROCESSING_CHANGE = False
 # Callback for rotary change
 def rotary_change(direction):
     print ("turned - " + str(direction))
@@ -40,24 +41,26 @@ def rotary_change(direction):
     # 0 - play previous folder
     global VIDEOS
     global CURR_INDEX
+    global PROCESSING_CHANGE
 
-    new_index = CURR_INDEX
-    if (direction == KY040.ANTICLOCKWISE):
-        print ("counterclockwise")
-        if (new_index + 1 >= len(VIDEOS)):
-            new_index = 0
+    if not PROCESSING_CHANGE:
+        PROCESSING_CHANGE = True
+        new_index = CURR_INDEX
+        if (direction == KY040.ANTICLOCKWISE):
+            if (new_index + 1 >= len(VIDEOS)):
+                new_index = 0
+            else:
+                new_index+=1
         else:
-            new_index+=1
-    else:
-        if (new_index - 1 < 0):
-            new_index = len(VIDEOS) - 1
-        else:
-            new_index-=1
-    if new_index != CURR_INDEX:
-        CURR_INDEX = new_index 
-        os.system('killall omxplayer.bin')
-        play_video(VIDEOS[list(VIDEOS)[CURR_INDEX]])
-
+            if (new_index - 1 < 0):
+                new_index = len(VIDEOS) - 1
+            else:
+                new_index-=1
+        if new_index != CURR_INDEX:
+            CURR_INDEX = new_index 
+            os.system('killall omxplayer.bin')
+            play_video(VIDEOS[list(VIDEOS)[CURR_INDEX]])
+        PROCESSING_CHANGE = False
 
 # Callback for switch button pressed
 def switch_pressed():
@@ -72,7 +75,6 @@ def switch_pressed():
 
 def get_videos():
     videos = {}
-
     for folder in os.listdir(ROOT_DIR):
         for file in os.listdir(os.path.join(ROOT_DIR, folder)):
             if file.lower().endswith('.mp4'):
