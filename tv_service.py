@@ -84,7 +84,13 @@ class TVService:
             print("starting video player")
             t = currentThread()
             for video in videos:
-                self.omxplayer = Popen(['omxplayer', '--no-osd', '--aspect-mode', 'fill', video])
+                self.omxplayer = Popen(
+                  ['omxplayer', '--no-osd', '--aspect-mode', 'fill', video],
+                  stdin=PIPE,
+                  stdout=PIPE,
+                  stderr=PIPE,
+                  close_fds=True
+                )
                 sleep(5)
                 while self.omxplayer.poll() is None:
                     if not getattr(t, "do_run", True):
