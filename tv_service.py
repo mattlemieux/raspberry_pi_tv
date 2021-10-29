@@ -92,7 +92,8 @@ class TVService:
                         return
                     sleep(10)
                     print("quitting after sleep")
-                    self.omxplayer.terminate()
+                    self.omxplayer.stdin.write('q')
+                    self.omxplayer.stdin.flush()
                     break
         except Exception as err:
             print(err)
