@@ -75,13 +75,13 @@ class TVService:
     def play_video_thread(self, videos):
         player = None
         try:
+            print("starting video player")
             for video in videos:
-                print("starting video player")
+                print("playing " + video)
                 player = OMXPlayer(video, args='--no-osd --vol -500 --aspect-mode fill')
                 player.play()
-                sleep(5)
-                while player.is_playing():
-                  sleep(0.5)
+                while (player.playback_status() == "Playing"):
+                    sleep(0.1)
         except Exception as err:
             print(err)
         finally:
