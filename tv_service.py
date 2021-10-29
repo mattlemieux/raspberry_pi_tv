@@ -78,6 +78,7 @@ class TVService:
             for video in videos:
                 print("starting video player")
                 player = OMXPlayer(video, args='--no-osd --vol -500 --aspect-mode fill')
+                player.play()
                 sleep(5)
                 while player.is_playing():
                   sleep(0.5)
