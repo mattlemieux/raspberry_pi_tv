@@ -88,8 +88,7 @@ class TVService:
                   ['omxplayer', '--no-osd', '--aspect-mode', 'fill', video],
                   stdin=PIPE,
                   stdout=PIPE,
-                  stderr=PIPE,
-                  close_fds=True
+                  stderr=PIPE
                 )
                 sleep(5)
                 while self.omxplayer.poll() is None:
@@ -98,16 +97,14 @@ class TVService:
                         return
                     sleep(10)
                     print("quitting after sleep")
-                    self.omxplayer.stdin.write('q')
-                    self.omxplayer.stdin.flush()
+                    self.omxplayer.communicate(input='q')
                     break
         except Exception as err:
             print(err)
         finally:
             print("shutting down video thread")
             if self.omxplayer is not None:
-                self.omxplayer.stdin.write('q')
-                self.omxplayer.stdin.flush()
+                self.omxplayer.communicate(input='q')
 
     def stop_play_video_thread(self):
         if (self.omx_thread and self.omx_thread.isAlive()):
