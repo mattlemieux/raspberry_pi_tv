@@ -73,7 +73,7 @@ class TVService:
 
 
     def play_video_thread(self, videos):
-        player = {}
+        player = None
         try:
             for video in videos:
                 print("starting video player")
