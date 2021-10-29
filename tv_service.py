@@ -85,7 +85,7 @@ class TVService:
             t = currentThread()
             for video in videos:
                 self.omxplayer = Popen(['omxplayer', '--no-osd', '--aspect-mode', 'fill', video])
-                
+                sleep(5)
                 while self.omxplayer.poll() is None:
                     if not getattr(t, "do_run", True):
                         print("qutting because do_run is false")
@@ -100,7 +100,8 @@ class TVService:
         finally:
             print("shutting down video thread")
             if self.omxplayer is not None:
-                self.omxplayer.terminate()
+                self.omxplayer.stdin.write('q')
+                self.omxplayer.stdin.flush()
 
     def stop_play_video_thread(self):
         if (self.omx_thread and self.omx_thread.isAlive()):
