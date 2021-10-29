@@ -79,9 +79,12 @@ class TVService:
             for video in videos:
                 print("playing " + video)
                 if player is None:
+                    print("   creating new player")
                     player = OMXPlayer(video, args='--no-osd --vol -500 --aspect-mode fill')
                 else:
+                    print("   loading new video")
                     player.load(video)
+                sleep(3)
                 player.play_sync()
         except Exception as err:
             print(err)
