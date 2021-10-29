@@ -92,12 +92,9 @@ class TVService:
                 while self.omxplayer.poll() is None:
                     if not getattr(t, "do_run", True):
                         print("qutting because do_run is false")
+                        self.omxplayer.stdin.write(b'q')
+                        self.omxplayer.stdin.flush()
                         return
-                    sleep(10)
-                    print("quitting after sleep")
-                    self.omxplayer.stdin.write(b'q')
-                    self.omxplayer.stdin.flush()
-                    break
         except Exception as err:
             print(err)
         finally:
