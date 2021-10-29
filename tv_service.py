@@ -1,6 +1,5 @@
 
 from KY040 import KY040
-from omxplayer.player import OMXPlayer
 from pathlib import Path
 from threading import Thread, Lock, currentThread
 from subprocess import PIPE, Popen, STDOUT
@@ -9,9 +8,6 @@ from time import sleep
 import os
 import random
 import RPi.GPIO as GPIO
-
-# sudo apt-get update && sudo apt-get install -y libdbus-1{,-dev}
-# pip install omxplayer-wrapper
 
 # rm CMakeCache.txt
 # cmake -DARMV6Z=ON -DADAFRUIT_HX8357D_PITFT=ON -DSPI_BUS_CLOCK_DIVISOR=8 -DSTATISTICS=0 -DBACKLIGHT_CONTROL=ON ..
@@ -92,16 +88,20 @@ class TVService:
                 while self.omxplayer.poll() is None:
                     if not getattr(t, "do_run", True):
                         print("qutting because do_run is false")
-                        self.omxplayer.stdin.write(b'q')
-                        self.omxplayer.stdin.flush()
+                        self.stop_omx_player()
                         return
+                self.stop_omx_player()
         except Exception as err:
             print(err)
         finally:
             print("shutting down video thread")
-            if self.omxplayer is not None and self.omxplayer.stdin is not None:
-                self.omxplayer.stdin.write(b'q')
-                self.omxplayer.stdin.flush()
+            self.stop_omx_player()
+
+    def stop_omx_player(self):
+        if self.omxplayer is not None and self.omxplayer.stdin is not None:
+            self.omxplayer.stdin.write(b'q')
+            self.omxplayer.stdin.flush()
+
 
     def stop_play_video_thread(self):
         if (self.omx_thread and self.omx_thread.isAlive()):
@@ -109,14 +109,17 @@ class TVService:
             self.omx_thread.do_run = False
             self.omx_thread.join()
 
+
     def start_play_video_thread(self, videos):
         print("starting video thread")
         self.omx_thread = Thread(target=self.play_video_thread, args=(videos,))
         self.omx_thread.start()
 
+
     def play_videos(self, videos):
         self.stop_play_video_thread()
         self.start_play_video_thread(videos)
+
 
     def run(self):
         print("staring video service")
