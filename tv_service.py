@@ -78,29 +78,35 @@ class TVService:
 
 
     def play_video_thread(self, videos):
-        player = {}
+        self.omxplayer = None
         try:
             print("starting video player")
             t = currentThread()
             for video in videos:
                 print("playing " + video)
-                player = OMXPlayer(video, args='--no-osd --vol -500 --aspect-mode fill')
+                if self.omxplayer is None:
+                    print ("    creating new player")
+                    self.omxplayer = OMXPlayer(video, args='--no-osd --vol -500 --aspect-mode fill')
+                else:
+                    print("   loading new video")
+                    self.omxplayer.load(video)
+                
                 sleep(5)
-                player.play()
-                while (player.playback_status() == "Playing"):
+                self.omxplayer.play()
+                while (self.omxplayer.playback_status() == "Playing"):
                     if not getattr(t, "do_run", True):
                         print("qutting because do_run is false")
                         return
                     sleep(10)
                     print("quitting after sleep")
-                    player.quit()
+                    self.omxplayer.quit()
                     break
         except Exception as err:
             print(err)
         finally:
             print("shutting down video thread")
-            if player is not None:
-                player.quit()
+            if self.omxplayer is not None:
+                self.omxplayer.quit()
 
     def stop_play_video_thread(self):
         if (self.omx_thread and self.omx_thread.isAlive()):
