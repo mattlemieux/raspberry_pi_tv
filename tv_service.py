@@ -3,6 +3,7 @@ from KY040 import KY040
 from omxplayer.player import OMXPlayer
 from pathlib import Path
 from threading import Thread, Lock, currentThread
+from subprocess import PIPE, Popen, STDOUT
 from time import sleep
 
 import os
@@ -83,30 +84,22 @@ class TVService:
             print("starting video player")
             t = currentThread()
             for video in videos:
-                print("playing " + video)
-                if self.omxplayer is None:
-                    print ("    creating new player")
-                    self.omxplayer = OMXPlayer(video, args='--no-osd --vol -500 --aspect-mode fill')
-                else:
-                    print("   loading new video")
-                    self.omxplayer.load(video)
+                self.omxplayer = Popen(['omxplayer', '--no-osd', '--aspect-mode', 'fill', video])
                 
-                sleep(5)
-                self.omxplayer.play()
-                while (self.omxplayer.playback_status() == "Playing"):
+                while self.omxplayer.poll() is None:
                     if not getattr(t, "do_run", True):
                         print("qutting because do_run is false")
                         return
                     sleep(10)
                     print("quitting after sleep")
-                    self.omxplayer.quit()
+                    self.omxplayer.terminate()
                     break
         except Exception as err:
             print(err)
         finally:
             print("shutting down video thread")
             if self.omxplayer is not None:
-                self.omxplayer.quit()
+                self.omxplayer.terminate()
 
     def stop_play_video_thread(self):
         if (self.omx_thread and self.omx_thread.isAlive()):
