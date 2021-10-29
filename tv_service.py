@@ -84,8 +84,9 @@ class TVService:
                 else:
                     print("   loading new video")
                     player.load(video)
-                sleep(3)
-                player.play_sync()
+                sleep(5)
+                player.play()
+                sleep(10)
         except Exception as err:
             print(err)
         finally:
