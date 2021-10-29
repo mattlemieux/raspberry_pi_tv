@@ -84,7 +84,7 @@ class TVService:
                 print("Playing...")
                 self.omxplayer.play()
                 print("sleeping...")
-                sleep(dur)
+                sleep(15)
                 print("quitting...")
                 self.omxplayer.quit()
         except Exception as err:
