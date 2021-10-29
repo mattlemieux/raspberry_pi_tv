@@ -91,7 +91,10 @@ class TVService:
                     if not getattr(t, "do_run", True):
                         print("qutting because do_run is false")
                         return
-                    sleep(0.1)
+                    sleep(10)
+                    print("quitting after sleep")
+                    player.quit()
+                    break
         except Exception as err:
             print(err)
         finally:
