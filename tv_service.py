@@ -5,7 +5,7 @@ import logging
 import os
 import RPi.GPIO as GPIO
 
-logging.basicConfig(filename='tvservice.log', encoding='utf-8', level=logging.INFO)
+logging.basicConfig(filename='tvservice.log', level=logging.INFO)
 # rm CMakeCache.txt
 # cmake -DARMV6Z=ON -DADAFRUIT_HX8357D_PITFT=ON -DSPI_BUS_CLOCK_DIVISOR=8 -DSTATISTICS=0 -DBACKLIGHT_CONTROL=ON ..
 # make -j

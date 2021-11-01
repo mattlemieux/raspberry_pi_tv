@@ -3,7 +3,7 @@ import logging
 import os
 import random
 
-logging.basicConfig(filename='playerservice.log', encoding='utf-8', level=logging.INFO)
+logging.basicConfig(filename='playerservice.log', level=logging.INFO)
 
 class PlayerService:
 
