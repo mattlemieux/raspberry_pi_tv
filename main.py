@@ -18,6 +18,8 @@ def main():
         Thread(target = tvservice.run())
     ]
 
+    print("top of threads")
+
     for thread in threads:
         print("Starting thread")
         thread.start()
