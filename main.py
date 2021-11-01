@@ -19,9 +19,11 @@ def main():
     ]
 
     for thread in threads:
+        print("Starting thread")
         thread.start()
 
     for thread in threads:
+        print("Waiting for thread join")
         thread.join()
 
 if __name__ == "__main__":
