@@ -28,6 +28,7 @@ class TVService:
     def rotary_change(self, direction):
         logger.debug("rotary_change - " + str(direction))
 
+
     def switch_pressed(self):
         if self.screen_on:
             self.turn_screen_off()
@@ -47,8 +48,9 @@ class TVService:
                 sleep(0.1)
         finally:
             logger.debug("shutting down tv_service")
-            self.ky040.stop()
             GPIO.cleanup()
+            self.ky040.stop()
+
 
     def __init__(self, clock_pin, data_pin, switch_pin, backlight_pin):
         GPIO.setmode(GPIO.BCM)
