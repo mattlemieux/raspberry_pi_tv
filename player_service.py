@@ -2,7 +2,6 @@ from subprocess import Popen
 import logging
 import os
 import random
-import asyncio
 
 logging.basicConfig(filename='playerservice.log', level=logging.INFO)
 
@@ -43,7 +42,7 @@ class PlayerService:
             else:
                 self.process = None
 
-    async def run(self):
+    def run(self):
         logging.info("starting player_service")
         logging.info("video directory: %s", self.video_dir)
         try:
