@@ -36,7 +36,7 @@ class TVService:
         self.screen_on = not self.screen_on
 
 
-    def run(self):
+    async def run(self):
         logging.info("staring tv_service")
         self.ky040.start()
         self.turn_screen_on()

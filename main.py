@@ -2,31 +2,20 @@ from KY040 import KY040
 from tv_service import TVService
 from player_service import PlayerService
 from threading import Thread
+import asyncio
 
-def main():
+async def main():
     CLOCKPIN = 13
     DATAPIN = 6
     SWITCHPIN = 5
     BACKLIGHTPIN = 18
     VIDEO_DIR = '/home/pi/videos'
 
-    playerservice = PlayerService(VIDEO_DIR)
-    tvservice = TVService(CLOCKPIN, DATAPIN, SWITCHPIN, BACKLIGHTPIN)
+    playerservice = asyncio.create_task(PlayerService(VIDEO_DIR).run())
+    tvservice = asyncio.create_task(TVService(CLOCKPIN, DATAPIN, SWITCHPIN, BACKLIGHTPIN).run())
 
-    threads = [
-        Thread(target = playerservice.run()),
-        Thread(target = tvservice.run())
-    ]
-
-    print("top of threads")
-
-    for thread in threads:
-        print("Starting thread")
-        thread.start()
-
-    for thread in threads:
-        print("Waiting for thread join")
-        thread.join()
+    await playerservice
+    awaittvservice
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
