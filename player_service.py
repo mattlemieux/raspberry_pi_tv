@@ -4,6 +4,7 @@ import os
 import random
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(filename='playerservice.log', encoding='utf-8', level=logging.INFO)
 
 class PlayerService:
 
@@ -43,13 +44,13 @@ class PlayerService:
                 self.process = None
 
     def run(self):
-        logger.debug("starting player_service")
-        logger.debug("video directory: %s", self.video_dir)
+        logger.info("starting player_service")
+        logger.info("video directory: %s", self.video_dir)
         try:
             while True:
                 self.start_player(self.videos)
         finally:
-            logger.debug("stopping player_service process")
+            logger.info("stopping player_service process")
             self.stop_player()
 
 

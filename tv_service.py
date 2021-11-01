@@ -6,7 +6,7 @@ import os
 import RPi.GPIO as GPIO
 
 logger = logging.getLogger(__name__)
-
+logging.basicConfig(filename='tvservice.log', encoding='utf-8', level=logging.INFO)
 # rm CMakeCache.txt
 # cmake -DARMV6Z=ON -DADAFRUIT_HX8357D_PITFT=ON -DSPI_BUS_CLOCK_DIVISOR=8 -DSTATISTICS=0 -DBACKLIGHT_CONTROL=ON ..
 # make -j
@@ -14,19 +14,19 @@ logger = logging.getLogger(__name__)
 
 class TVService:
     def turn_screen_on(self):
-        logger.debug("turning screen on")
+        logger.info("turning screen on")
         os.system('raspi-gpio set 19 op a5') # audio on
         GPIO.output(18, GPIO.HIGH) # video on
 
 
     def turn_screen_off(self):
-        logger.debug("turning screen off")
+        logger.info("turning screen off")
         os.system('raspi-gpio set 19 ip') # audio off
         GPIO.output(18, GPIO.LOW) # video off
 
 
     def rotary_change(self, direction):
-        logger.debug("rotary_change - " + str(direction))
+        logger.info("rotary_change - " + str(direction))
 
 
     def switch_pressed(self):
@@ -38,16 +38,16 @@ class TVService:
 
 
     def run(self):
-        logger.debug("staring tv_service")
+        logger.info("staring tv_service")
         self.ky040.start()
         self.turn_screen_on()
 
         try:
-            logger.debug("listening for events....")
+            logger.info("listening for events....")
             while True:
                 sleep(0.1)
         finally:
-            logger.debug("shutting down tv_service")
+            logger.info("shutting down tv_service")
             GPIO.cleanup()
             self.ky040.stop()
 
