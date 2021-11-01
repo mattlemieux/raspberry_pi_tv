@@ -3,7 +3,6 @@ import logging
 import os
 import random
 
-logger = logging.getLogger(__name__)
 logging.basicConfig(filename='playerservice.log', encoding='utf-8', level=logging.INFO)
 
 class PlayerService:
@@ -30,7 +29,7 @@ class PlayerService:
                 )
                 self.process.wait()
         except Exception as e:
-            logger.error("Error occured playing file [%s]: %s", self.currentFile, e)
+            logging.error("Error occured playing file [%s]: %s", self.currentFile, e)
 
     def stop_player(self):
         p = self.process
@@ -39,21 +38,22 @@ class PlayerService:
                 p.terminate()
                 p.wait()
             except EnvironmentError as e:
-                logger.error("can't stop %s: %s", self.currentFile, e)
+                logging.error("can't stop %s: %s", self.currentFile, e)
             else:
                 self.process = None
 
     def run(self):
-        logger.info("starting player_service")
-        logger.info("video directory: %s", self.video_dir)
+        logging.info("starting player_service")
+        logging.info("video directory: %s", self.video_dir)
         try:
             while True:
                 self.start_player(self.videos)
         finally:
-            logger.info("stopping player_service process")
+            logging.info("stopping player_service process")
             self.stop_player()
 
 
     def __init__(self, video_dir):
+        self.currentFile = ""
         self.video_dir = video_dir
         self.videos = self.get_videos()
