@@ -15,7 +15,7 @@ async def main():
     tvservice = asyncio.create_task(TVService(CLOCKPIN, DATAPIN, SWITCHPIN, BACKLIGHTPIN).run())
 
     await playerservice
-    awaittvservice
+    await tvservice
 
 if __name__ == "__main__":
     asyncio.run(main())
